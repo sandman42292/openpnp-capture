@@ -31,6 +31,8 @@
 #include "platformcontext.h"
 #include "scopedcomptr.h"
 
+#include <cmath>
+
 extern HRESULT FindCaptureDevice(IBaseFilter** ppSrcFilter, const wchar_t* wDeviceName);
 extern void _FreeMediaType(AM_MEDIA_TYPE& mt);
 
@@ -300,7 +302,7 @@ bool PlatformStream::open(Context *owner, deviceInfo *device, uint32_t width, ui
                     switch(format4CC)
                     {
                     case BI_RGB:
-                        format4CC = 'RGB ';
+                        format4CC = MAKEFOURCC('R', 'G', 'B', ' ');
                         break;
                     }
 
@@ -545,8 +547,8 @@ void PlatformStream::dumpCameraProperties()
         if (m_camControl->GetRange(CameraControl_Exposure, &mmin, &mmax,
             &delta, &defaultValue, &flags) == S_OK)
         {
-            LOG(LOG_INFO, "Exposure min     : %2.3f seconds (%d integer)\n", pow(2.0f, (float)mmin), mmin);
-            LOG(LOG_INFO, "Exposure max     : %2.3f seconds (%d integer)\n", pow(2.0f, (float)mmax), mmax);
+            LOG(LOG_INFO, "Exposure min     : %2.3f seconds (%d integer)\n", std::pow(2.0f, (float)mmin), mmin);
+            LOG(LOG_INFO, "Exposure max     : %2.3f seconds (%d integer)\n", std::pow(2.0f, (float)mmax), mmax);
             LOG(LOG_INFO, "Exposure step    : %d (integer)\n", delta);
             LOG(LOG_INFO, "Exposure default : %2.3f seconds\n", pow(2.0f, (float)defaultValue));		
             LOG(LOG_INFO, "Flags            : %08X\n", flags);
@@ -839,7 +841,8 @@ bool PlatformStream::getAutoProperty(uint32_t propID, bool &enabled)
     // to simplify the code.
     // We make sure this assumption is true via a static assert
     
-    static_assert(CameraControl_Flags_Auto == VideoProcAmp_Flags_Auto, "Boolean flags dont match - code change needed!");
+    static_assert(static_cast<int>(CameraControl_Flags_Auto) == static_cast<int>(VideoProcAmp_Flags_Auto),
+                  "Boolean flags dont match - code change needed!");
     //static_assert(CameraControl_Flags_Manual == VideoProcAmp_Flags_Manual, "Boolean flags dont match - code change needed!");
 
     //LOG(LOG_VERBOSE, "PlatformStream::getAutoProperty called\n");
