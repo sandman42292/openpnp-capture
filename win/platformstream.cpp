@@ -301,7 +301,7 @@ bool PlatformStream::open(Context *owner, deviceInfo *device, uint32_t width, ui
                     switch(format4CC)
                     {
                     case BI_RGB:
-                        format4CC = 'RGB ';
+                        format4CC = MAKEFOURCC('R', 'G', 'B', ' ');
                         break;
                     }
 
@@ -840,7 +840,8 @@ bool PlatformStream::getAutoProperty(uint32_t propID, bool &enabled)
     // to simplify the code.
     // We make sure this assumption is true via a static assert
     
-    static_assert(CameraControl_Flags_Auto == VideoProcAmp_Flags_Auto, "Boolean flags dont match - code change needed!");
+    static_assert(static_cast<int>(CameraControl_Flags_Auto) == static_cast<int>(VideoProcAmp_Flags_Auto),
+                  "Boolean flags dont match - code change needed!");
     //static_assert(CameraControl_Flags_Manual == VideoProcAmp_Flags_Manual, "Boolean flags dont match - code change needed!");
 
     //LOG(LOG_VERBOSE, "PlatformStream::getAutoProperty called\n");
